@@ -1,0 +1,9 @@
+{
+"name": "Robot Inwestycyjny",
+"short_name": "Robot",
+"start_url": ".",
+"display": "standalone",
+"background_color": "#111",
+"description": "Robot inwestycyjny",
+"icons": []
+}

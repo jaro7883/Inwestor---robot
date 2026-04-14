@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Robot Inwestycyjny V2</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0b1220" />
+  <style>
+    :root {
+      --bg: #08101d;
+      --card: #101a2e;
+      --muted: #8fa3c7;
+      --text: #eef4ff;
+      --line: #22314f;
+      --green: #2dd4bf;
+      --red: #fb7185;
+      --amber: #f59e0b;
+      --blue: #60a5fa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #07101d 0%, #0b1220 100%);
+      color: var(--text);
+    }
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: env(safe-area-inset-top) 14px calc(80px + env(safe-area-inset-bottom));
+    }
+    .top {
+      padding: 14px 4px 8px;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+    }
+    .sub {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+    .card {
+      background: rgba(16, 26, 46, 0.9);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .muted { color: var(--muted); }
+    .tiny { font-size: 12px; }
+    .title { font-size: 16px; font-weight: 700; }
+    .big { font-size: 24px; font-weight: 800; }
+    .pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+    .ok { background: rgba(45,212,191,.12); color: #90f6e7; border-color: rgba(45,212,191,.25); }
+    .warn { background: rgba(245,158,11,.12); color: #ffd287; border-color: rgba(245,158,11,.25); }
+    .bad { background: rgba(251,113,133,.12); color: #ffb0bd; border-color: rgba(251,113,133,.25); }
+    .info { background: rgba(96,165,250,.12); color: #bdd7ff; border-color: rgba(96,165,250,.25); }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .metric {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 14px;
+      padding: 10px;
+    }
+    .list { display: grid; gap: 10px; }
+    .asset {
+      background: rgba(255,255,255,.025);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .score {
+      font-weight: 800;
+      font-size: 20px;
+    }
+    .bars {
+      height: 8px;
+      background: rgba(255,255,255,.06);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #60a5fa, #2dd4bf);
+    }
+    .allocation {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .alloc-row {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      font-size: 14px;
+    }
+    input, select {
+      width: 100%;
+      background: #0a1324;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 16px;
+    }
+    .controls {
+      display: grid;
+      gap: 10px;
+    }
+    .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: #13213d;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    button.primary {
+      background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+      border-color: #2a62ea;
+    }
+    .bottom-nav {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      background: rgba(8, 16, 29, .92);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .nav-wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .tab-btn {
+      border-radius: 14px;
+      padding: 10px 8px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .tab-btn.active {
+      color: var(--text);
+      background: rgba(255,255,255,.04);
+      border-color: rgba(255,255,255,.08);
+    }
+    .tab { display: none; }
+    .tab.active { display: block; }
+    .separator { height: 1px; background: var(--line); margin: 10px 0; }
+    .pos { color: var(--green); }
+    .neg { color: var(--red); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top">
+      <h1>Robot Inwestycyjny</h1>
+      <div class="sub">Wersja 2 — lepszy scoring, radar okazji, tryb pod telefon</div>
+    </div>
+
+    <section id="tab-today" class="tab active grid"></section>
+    <section id="tab-radar" class="tab grid"></section>
+    <section id="tab-portfolio" class="tab grid"></section>
+    <section id="tab-settings" class="tab grid"></section>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="nav-wrap">
+      <button class="tab-btn active" data-tab="today">Dziś</button>
+      <button class="tab-btn" data-tab="radar">Radar</button>
+      <button class="tab-btn" data-tab="portfolio">Portfel</button>
+      <button class="tab-btn" data-tab="settings">Ustawienia</button>
+    </div>
+  </nav>
+
+  <script>
+    const DEFAULT_STATE = {
+      monthlyBudget: 1000,
+      mode: 'balanced',
+      allowCrypto: true,
+      allowCommodities: true,
+      maxHardcorePct: 15,
+      portfolio: {
+        core: 65,
+        growth: 20,
+        hardcore: 10,
+        cash: 5
+      },
+      manualQuotes: {
+        VWCE: { price: 129.8, d7: -1.8, d30: -3.5, d90: 4.1 },
+        QQQ: { price: 512.4, d7: 2.4, d30: 5.6, d90: 9.8 },
+        NVDA: { price: 121.7, d7: 4.8, d30: 14.2, d90: 22.4 },
+        PLTR: { price: 28.4, d7: 1.3, d30: 8.6, d90: 18.9 },
+        GOLD: { price: 236.1, d7: 0.9, d30: 4.2, d90: 11.8 },
+        OIL: { price: 77.5, d7: -3.4, d30: -6.1, d90: 2.2 },
+        URANIUM: { price: 41.8, d7: -4.2, d30: -9.0, d90: 6.0 },
+        SEMI: { price: 88.9, d7: 2.1, d30: 10.7, d90: 16.2 }
+      }
+    };
+
+    const ASSETS = [
+      { key: 'VWCE', label: 'VWCE', bucket: 'core', type: 'ETF globalny', desc: 'Baza portfela' },
+      { key: 'QQQ', label: 'Nasdaq / growth', bucket: 'growth', type: 'ETF tech', desc: 'Tech i momentum' },
+      { key: 'NVDA', label: 'NVIDIA', bucket: 'growth', type: 'Akcja', desc: 'AI / półprzewodniki' },
+      { key: 'PLTR', label: 'Palantir', bucket: 'growth', type: 'Akcja', desc: 'High beta AI' },
+      { key: 'BTC', label: 'Bitcoin', bucket: 'hardcore', type: 'Krypto', desc: 'Mocna zmienność' },
+      { key: 'ETH', label: 'Ethereum', bucket: 'hardcore', type: 'Krypto', desc: 'Krypto growth' },
+      { key: 'GOLD', label: 'Złoto', bucket: 'hardcore', type: 'Surowiec', desc: 'Defensywa / hedge' },
+      { key: 'OIL', label: 'Ropa', bucket: 'hardcore', type: 'Surowiec', desc: 'Makro / energia' },
+      { key: 'URANIUM', label: 'Uran', bucket: 'hardcore', type: 'Motyw', desc: 'Motyw wysokiego ryzyka' },
+      { key: 'SEMI', label: 'ETF półprzewodniki', bucket: 'growth', type: 'ETF sektorowy', desc: 'Sektor AI' }
+    ];
+
+    const MODE_MULTIPLIER = {
+      defensive: { hardcore: 0.7, growth: 0.85 },
+      balanced: { hardcore: 1.0, growth: 1.0 },
+      aggressive: { hardcore: 1.25, growth: 1.15 }
+    };
+
+    let state = loadState();
+    let live = {
+      btc: null,
+      eth: null,
+      fearGreed: null,
+      updatedAt: null,
+      liveOk: false
+    };
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem('investor_robot_v2');
+        return raw ? JSON.parse(raw) : structuredClone(DEFAULT_STATE);
+      } catch {
+        return structuredClone(DEFAULT_STATE);
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem('investor_robot_v2', JSON.stringify(state));
+    }
+
+    async function fetchLiveData() {
+      try {
+        const cg = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true');
+        const cgData = await cg.json();
+
+        // alternative.me by proxy because CORS can be flaky directly from GitHub Pages
+        const fg = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.alternative.me/fng/?limit=1'));
+        const fgData = await fg.json();
+
+        live.btc = {
+          price: cgData.bitcoin?.usd ?? null,
+          d1: cgData.bitcoin?.usd_24h_change ?? null
+        };
+        live.eth = {
+          price: cgData.ethereum?.usd ?? null,
+          d1: cgData.ethereum?.usd_24h_change ?? null
+        };
+        live.fearGreed = fgData?.data?.[0] ? {
+          value: Number(fgData.data[0].value),
+          label: fgData.data[0].value_classification
+        } : null;
+        live.updatedAt = new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+        live.liveOk = true;
+      } catch (e) {
+        live.liveOk = false;
+      }
+    }
+
+    function getQuote(assetKey) {
+      if (assetKey === 'BTC' && live.btc) {
+        return { price: live.btc.price, d7: null, d30: null, d90: null, d1: live.btc.d1 };
+      }
+      if (assetKey === 'ETH' && live.eth) {
+        return { price: live.eth.price, d7: null, d30: null, d90: null, d1: live.eth.d1 };
+      }
+      return state.manualQuotes[assetKey] || { price: null, d7: 0, d30: 0, d90: 0 };
+    }
+
+    function marketRegime() {
+      const fg = live.fearGreed?.value;
+      const core = getQuote('VWCE');
+      const qqq = getQuote('QQQ');
+
+      let score = 50;
+      if (typeof fg === 'number') score += (fg - 50) * 0.5;
+      if ((core.d30 ?? 0) > 0) score += 7;
+      if ((qqq.d30 ?? 0) > 0) score += 6;
+      if ((qqq.d30 ?? 0) < -6) score -= 10;
+
+      if (score >= 65) return { code: 'risk-on', label: 'Risk-on', cls: 'ok' };
+      if (score <= 40) return { code: 'risk-off', label: 'Risk-off', cls: 'bad' };
+      return { code: 'neutral', label: 'Neutralnie', cls: 'warn' };
+    }
+
+    function scoreAsset(asset) {
+      const q = getQuote(asset.key);
+      const mode = MODE_MULTIPLIER[state.mode];
+      const regime = marketRegime();
+      let score = 50;
+
+      const d7 = q.d7 ?? 0;
+      const d30 = q.d30 ?? 0;
+      const d90 = q.d90 ?? 0;
+      const d1 = q.d1 ?? 0;
+
+      // contrarian short term
+      if (d7 <= -6) score += 12;
+      else if (d7 <= -2) score += 6;
+      else if (d7 >= 6) score -= 8;
+      else if (d7 >= 2) score -= 4;
+
+      // medium term structure
+      if (asset.bucket === 'core') {
+        if (d30 <= -4) score += 10;
+        if (d90 > 0) score += 5;
+      }
+      if (asset.bucket === 'growth') {
+        if (d30 > 0 && d30 < 12) score += 10;
+        if (d30 >= 12) score -= 6;
+        if (d90 > 10) score += 6;
+      }
+      if (asset.bucket === 'hardcore') {
+        if (d30 <= -8) score += 14;
+        if (d30 >= 10) score -= 10;
+        if (d90 > 20) score -= 6;
+      }
+
+      // regime impact
+      if (regime.code === 'risk-off') {
+        if (asset.key === 'GOLD') score += 12;
+        if (asset.key === 'BTC' || asset.key === 'ETH' || asset.key === 'OIL') score -= 10;
+      }
+      if (regime.code === 'risk-on') {
+        if (asset.bucket === 'growth') score += 6;
+        if (asset.key === 'BTC' || asset.key === 'ETH') score += 5;
+      }
+
+      // fear & greed influence on crypto
+      if ((asset.key === 'BTC' || asset.key === 'ETH') && live.fearGreed) {
+        if (live.fearGreed.value < 35) score += 10;
+        if (live.fearGreed.value > 75) score -= 12;
+      }
+
+      // risk preference
+      if (asset.bucket === 'hardcore') score *= mode.hardcore;
+      if (asset.bucket === 'growth') score *= mode.growth;
+
+      // user toggles
+      if (!state.allowCrypto && (asset.key === 'BTC' || asset.key === 'ETH')) score = -999;
+      if (!state.allowCommodities && (asset.key === 'GOLD' || asset.key === 'OIL' || asset.key === 'URANIUM')) score = -999;
+
+      return Math.max(0, Math.min(99, Math.round(score)));
+    }
+
+    function labelForScore(score) {
+      if (score >= 78) return { text: 'Mocna okazja', cls: 'ok' };
+      if (score >= 64) return { text: 'Warto rozważyć', cls: 'info' };
+      if (score >= 50) return { text: 'Neutralnie', cls: 'warn' };
+      return { text: 'Za drogo / słabo', cls: 'bad' };
+    }
+
+    function buildRadar() {
+      return ASSETS
+        .map(asset => ({ ...asset, score: scoreAsset(asset), quote: getQuote(asset.key) }))
+        .filter(x => x.score >= 0)
+        .sort((a, b) => b.score - a.score);
+    }
+
+    function buildRecommendation(radar) {
+      const budget = Number(state.monthlyBudget) || 0;
+      const regime = marketRegime();
+      let core = Math.round(budget * 0.65);
+      let growth = Math.round(budget * 0.20);
+      let hardcore = Math.round(budget * 0.10);
+      let cash = budget - core - growth - hardcore;
+
+      if (regime.code === 'risk-off') {
+        core = Math.round(budget * 0.75);
+        growth = Math.round(budget * 0.10);
+        hardcore = Math.round(budget * 0.05);
+        cash = budget - core - growth - hardcore;
+      }
+      if (state.mode === 'aggressive') {
+        growth += 50;
+        hardcore += 50;
+        core -= 100;
+      }
+      if (state.mode === 'defensive') {
+        core += 70;
+        hardcore -= 50;
+        growth -= 20;
+      }
+      hardcore = Math.min(hardcore, Math.round(budget * (state.maxHardcorePct / 100)));
+      cash = budget - core - growth - hardcore;
+
+      const topGrowth = radar.find(x => x.bucket === 'growth');
+      const topHardcore = radar.find(x => x.bucket === 'hardcore');
+
+      if (!topHardcore || topHardcore.score < 62) {
+        cash += hardcore;
+        hardcore = 0;
+      }
+      if (!topGrowth || topGrowth.score < 58) {
+        core += Math.round(growth * 0.7);
+        cash += growth - Math.round(growth * 0.7);
+        growth = 0;
+      }
+
+      return {
+        regime,
+        budget,
+        core,
+        growth,
+        hardcore,
+        cash,
+        topGrowth,
+        topHardcore,
+        narrative: narrativeText({ regime, topGrowth, topHardcore, core, growth, hardcore, cash })
+      };
+    }
+
+    function narrativeText({ regime, topGrowth, topHardcore, core, growth, hardcore, cash }) {
+      const lines = [];
+      if (regime.code === 'risk-off') lines.push('Rynek wygląda defensywnie, więc robot podbija bazę i ogranicza agresywne ruchy.');
+      if (regime.code === 'risk-on') lines.push('Rynek jest bardziej sprzyjający ryzyku, więc można utrzymać ekspozycję growth.');
+      if (topGrowth && growth > 0) lines.push(`Najmocniejszy kandydat growth: ${topGrowth.label}.`);
+      if (topHardcore && hardcore > 0) lines.push(`Najmocniejsza okazja hardcore: ${topHardcore.label}.`);
+      if (hardcore === 0) lines.push('W tym układzie slot hardcore został wstrzymany lub zredukowany.');
+      if (cash > 0) lines.push('Część środków zostaje jako amunicja na lepsze wejście.');
+      return lines.join(' ');
+    }
+
+    function renderToday() {
+      const radar = buildRadar();
+      const rec = buildRecommendation(radar);
+      const fg = live.fearGreed;
+
+      document.getElementById('tab-today').innerHTML = `
+        <div class="card">
+          <div class="row">
+            <div>
+              <div class="muted tiny">Status rynku</div>
+              <div class="title">${rec.regime.label}</div>
+            </div>
+            <span class="pill ${rec.regime.cls}">${rec.regime.label}</span>
+          </div>
+          <div class="metric-grid">
+            <div class="metric">
+              <div class="muted tiny">Budżet miesięczny</div>
+              <div class="big">${rec.budget} zł</div>
+            </div>
+            <div class="metric">
+              <div class="muted tiny">Fear & Greed</div>
+              <div class="big">${fg ? fg.value : '—'}</div>
+              <div class="tiny muted">${fg ? fg.label : 'brak live'}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="title">Rekomendacja na teraz</div>
+          <div class="allocation">
+            <div class="alloc-row"><span>ETF / baza</span><strong>${rec.core} zł</strong><span class="muted">VWCE</span></div>
+            <div class="alloc-row"><span>Growth</span><strong>${rec.growth} zł</strong><span class="muted">${rec.topGrowth ? rec.topGrowth.label : 'pauza'}</span></div>
+            <div class="alloc-row"><span>Hardcore</span><strong>${rec.hardcore} zł</strong><span class="muted">${rec.topHardcore ? rec.topHardcore.label : 'pauza'}</span></div>
+            <div class="alloc-row"><span>Gotówka</span><strong>${rec.cash} zł</strong><span class="muted">amunicja</span></div>
+          </div>
+          <div class="separator"></div>
+          <div class="muted">${rec.narrative}</div>
+        </div>
+
+        <div class="card">
+          <div class="row">
+            <div class="title">Szybkie dane live</div>
+            <div class="tiny muted">${live.updatedAt ? 'akt. ' + live.updatedAt : 'tryb demo'}</div>
+          </div>
+          <div class="metric-grid">
+            <div class="metric">
+              <div class="muted tiny">BTC</div>
+              <div class="big">${live.btc ? '$' + Math.round(live.btc.price).toLocaleString('pl-PL') : '—'}</div>
+              <div class="tiny ${live.btc?.d1 >= 0 ? 'pos' : 'neg'}">${live.btc?.d1 ? live.btc.d1.toFixed(2) + '% 24h' : 'brak live'}</div>
+            </div>
+            <div class="metric">
+              <div class="muted tiny">ETH</div>
+              <div class="big">${live.eth ? '$' + Math.round(live.eth.price).toLocaleString('pl-PL') : '—'}</div>
+              <div class="tiny ${live.eth?.d1 >= 0 ? 'pos' : 'neg'}">${live.eth?.d1 ? live.eth.d1.toFixed(2) + '% 24h' : 'brak live'}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderRadar() {
+      const radar = buildRadar();
+      document.getElementById('tab-radar').innerHTML = `
+        <div class="card">
+          <div class="title">Radar okazji</div>
+          <div class="muted">Ranking tego, co robot uważa dziś za najciekawsze.</div>
+        </div>
+        <div class="list">
+          ${radar.map(item => {
+            const lab = labelForScore(item.score);
+            return `
+              <div class="asset">
+                <div class="row">
+                  <div>
+                    <div class="title">${item.label}</div>
+                    <div class="tiny muted">${item.type} • ${item.desc}</div>
+                  </div>
+                  <div style="text-align:right;">
+                    <div class="score">${item.score}</div>
+                    <span class="pill ${lab.cls}">${lab.text}</span>
+                  </div>
+                </div>
+                <div class="bars"><div class="fill" style="width:${item.score}%;"></div></div>
+                <div class="metric-grid">
+                  <div class="metric"><div class="tiny muted">Cena</div><div>${item.quote.price ?? '—'}</div></div>
+                  <div class="metric"><div class="tiny muted">7 dni</div><div class="${(item.quote.d7 ?? 0) >= 0 ? 'pos' : 'neg'}">${item.quote.d7 == null ? '—' : item.quote.d7 + '%'}</div></div>
+                  <div class="metric"><div class="tiny muted">30 dni</div><div class="${(item.quote.d30 ?? 0) >= 0 ? 'pos' : 'neg'}">${item.quote.d30 == null ? '—' : item.quote.d30 + '%'}</div></div>
+                  <div class="metric"><div class="tiny muted">90 dni</div><div class="${(item.quote.d90 ?? 0) >= 0 ? 'pos' : 'neg'}">${item.quote.d90 == null ? '—' : item.quote.d90 + '%'}</div></div>
+                </div>
+              </div>`;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function renderPortfolio() {
+      const radar = buildRadar();
+      const topG = radar.find(x => x.bucket === 'growth');
+      const topH = radar.find(x => x.bucket === 'hardcore');
+      document.getElementById('tab-portfolio').innerHTML = `
+        <div class="card">
+          <div class="title">Docelowa struktura</div>
+          <div class="allocation">
+            <div class="alloc-row"><span>Core</span><strong>${state.portfolio.core}%</strong><span class="muted">ETF globalny</span></div>
+            <div class="alloc-row"><span>Growth</span><strong>${state.portfolio.growth}%</strong><span class="muted">Tech / AI</span></div>
+            <div class="alloc-row"><span>Hardcore</span><strong>${state.portfolio.hardcore}%</strong><span class="muted">Okazje</span></div>
+            <div class="alloc-row"><span>Cash</span><strong>${state.portfolio.cash}%</strong><span class="muted">Rezerwa</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="title">Najmocniejsze sloty</div>
+          <div class="metric-grid">
+            <div class="metric">
+              <div class="tiny muted">Growth</div>
+              <div class="title">${topG ? topG.label : '—'}</div>
+              <div class="tiny muted">score ${topG ? topG.score : '—'}</div>
+            </div>
+            <div class="metric">
+              <div class="tiny muted">Hardcore</div>
+              <div class="title">${topH ? topH.label : '—'}</div>
+              <div class="tiny muted">score ${topH ? topH.score : '—'}</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="title">Jak czytać ten ekran</div>
+          <div class="muted">Core to część, która ma pracować stale. Growth dostaje więcej, gdy trend jest zdrowy. Hardcore jest dynamiczny i może czasem spaść do zera, jeśli robot nie widzi dobrej okazji.</div>
+        </div>
+      `;
+    }
+
+    function renderSettings() {
+      document.getElementById('tab-settings').innerHTML = `
+        <div class="card">
+          <div class="title">Parametry strategii</div>
+          <div class="controls" style="margin-top:12px;">
+            <label>
+              <div class="tiny muted">Budżet miesięczny</div>
+              <input id="monthlyBudget" type="number" min="100" step="50" value="${state.monthlyBudget}" />
+            </label>
+            <label>
+              <div class="tiny muted">Tryb</div>
+              <select id="mode">
+                <option value="defensive" ${state.mode === 'defensive' ? 'selected' : ''}>Defensywny</option>
+                <option value="balanced" ${state.mode === 'balanced' ? 'selected' : ''}>Zbalansowany</option>
+                <option value="aggressive" ${state.mode === 'aggressive' ? 'selected' : ''}>Agresywny</option>
+              </select>
+            </label>
+            <label>
+              <div class="tiny muted">Maksymalny udział hardcore (%)</div>
+              <input id="maxHardcorePct" type="number" min="0" max="30" step="1" value="${state.maxHardcorePct}" />
+            </label>
+            <label>
+              <div class="row"><span>Krypto</span><input id="allowCrypto" type="checkbox" ${state.allowCrypto ? 'checked' : ''} style="width:auto; transform:scale(1.2);" /></div>
+            </label>
+            <label>
+              <div class="row"><span>Surowce / motywy</span><input id="allowCommodities" type="checkbox" ${state.allowCommodities ? 'checked' : ''} style="width:auto; transform:scale(1.2);" /></div>
+            </label>
+            <div class="btns">
+              <button class="primary" id="saveBtn">Zapisz</button>
+              <button id="refreshLiveBtn">Odśwież live</button>
+              <button id="resetBtn">Reset</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="title">Co już działa</div>
+          <div class="muted">Live dla BTC/ETH i Fear & Greed, scoring wielowarstwowy, rekomendacja alokacji, radar okazji, zapis ustawień lokalnie.</div>
+        </div>
+        <div class="card">
+          <div class="title">Czego jeszcze tu nie ma</div>
+          <div class="muted">Live dla ETF, akcji, złota i ropy bez zewnętrznego backendu lub stabilnego źródła danych. Ten ekran jest przygotowany pod następny etap.</div>
+        </div>
+      `;
+
+      document.getElementById('saveBtn').onclick = () => {
+        state.monthlyBudget = Number(document.getElementById('monthlyBudget').value || 1000);
+        state.mode = document.getElementById('mode').value;
+        state.maxHardcorePct = Number(document.getElementById('maxHardcorePct').value || 15);
+        state.allowCrypto = document.getElementById('allowCrypto').checked;
+        state.allowCommodities = document.getElementById('allowCommodities').checked;
+        saveState();
+        renderAll();
+      };
+      document.getElementById('resetBtn').onclick = () => {
+        state = structuredClone(DEFAULT_STATE);
+        saveState();
+        renderAll();
+      };
+      document.getElementById('refreshLiveBtn').onclick = async () => {
+        await fetchLiveData();
+        renderAll();
+      };
+    }
+
+    function renderAll() {
+      renderToday();
+      renderRadar();
+      renderPortfolio();
+      renderSettings();
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('service-worker.js').catch(() => {}));
+    }
+
+    (async function init() {
+      await fetchLiveData();
+      renderAll();
+    })();
+  </script>
+</body>
+</html>

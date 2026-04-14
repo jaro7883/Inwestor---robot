@@ -1,0 +1,10 @@
+{
+  "name": "Robot Inwestycyjny V2",
+  "short_name": "Robot V2",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#08101d",
+  "theme_color": "#0b1220",
+  "description": "Mobilny radar inwestycyjny z rekomendacjami",
+  "icons": []
+}
